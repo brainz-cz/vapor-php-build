@@ -328,7 +328,12 @@ RUN set -xe; \
 
 WORKDIR  ${PHP_BUILD_DIR}/
 
-RUN LD_LIBRARY_PATH= yum install -y readline-devel gettext-devel libicu-devel libxslt-devel
+RUN LD_LIBRARY_PATH= yum install -y readline-devel gettext-devel libicu-devel libxslt-devel openldap-devel cyrus-sasl-devel
+
+RUN ln -s /usr/lib64/libldap.so /usr/lib/libldap.so && \
+    ln -s /usr/lib64/libldap_r.so /usr/lib/libldap_r.so && \
+    ln -s /usr/lib64/liblber.so /usr/lib/liblber.so && \
+    ln -s /usr/lib64/liblber-2.4.so.2 /usr/lib/liblber-2.4.so.2
 
 RUN set -xe \
  && ./buildconf --force \
@@ -368,6 +373,8 @@ RUN set -xe \
         --enable-zip \
         --with-pdo-pgsql=shared,${INSTALL_DIR} \
         --enable-intl=shared \
+        --with-ldap \
+        --with-ldap-sasl \
         --enable-opcache-file
 
 RUN make -j $(nproc)
